@@ -1,8 +1,40 @@
 #include <cstring>
 #include <fstream>
+#include <cassert>
+#include "utils.hpp"
 #include "sha256.hpp"
 
-const unsigned int SHA256::sha256_k[64] = {
+Crypto::Sha256Hash::Sha256Hash(const unsigned int hash[HASH_LEN], size_t len) {
+  assert(hash && len == HASH_LEN);
+  std::memcpy(value, hash, sizeof(value));
+}
+
+Crypto::Sha256Hash::Sha256Hash(const char *str) :
+      value() {
+  assert(str && strlen(str) == HASH_LEN * 2);
+  for (int i = 0; i < HASH_LEN * 2; i++) {
+    int digit = Utils::parseHexDigit(str[HASH_LEN * 2 - 1 - i]);
+    assert(digit != -1);
+    value[i >> 1] |= digit << ((i & 1) << 2);
+  }
+}
+
+bool Crypto::Sha256Hash::operator==(const Sha256Hash &other) const {
+  int diff = 0;
+  for (int i = 0; i < HASH_LEN; i++) {
+    diff |= value[i] ^ other.value[i];
+    if (diff) return false;
+  }
+  return diff == 0;
+}
+
+bool Crypto::Sha256Hash::operator!=(const Sha256Hash &other) const {
+  return !(*this == other);
+}
+
+
+
+const unsigned int Crypto::SHA256::sha256_k[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -21,7 +53,7 @@ const unsigned int SHA256::sha256_k[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-void SHA256::transform(const unsigned char *message, unsigned int block_nb) {
+void Crypto::SHA256::transform(const unsigned char *message, unsigned int block_nb) {
 	uint32 w[64], wv[8];
 	uint32 t1, t2;
 	int i, j;
@@ -56,7 +88,7 @@ void SHA256::transform(const unsigned char *message, unsigned int block_nb) {
 	}
 }
 
-void SHA256::init() {
+void Crypto::SHA256::init() {
 	m_h[0] = 0x6a09e667;
 	m_h[1] = 0xbb67ae85;
 	m_h[2] = 0x3c6ef372;
@@ -69,7 +101,7 @@ void SHA256::init() {
 	m_tot_len = 0;
 }
 
-void SHA256::update(const unsigned char *message, unsigned int len) {
+void Crypto::SHA256::update(const unsigned char *message, unsigned int len) {
 	unsigned int block_nb, new_len, rem_len, tmp_len;
 	const unsigned char *shifted_message;
 
@@ -92,7 +124,7 @@ void SHA256::update(const unsigned char *message, unsigned int len) {
 	m_tot_len += (block_nb + 1) << 6;
 }
 
-void SHA256::final(unsigned char *digest) {
+void Crypto::SHA256::final(unsigned char *digest) {
 	unsigned int block_nb, pm_len, len_b;
 
 	block_nb = (1 + ((SHA224_256_BLOCK_SIZE - 9)

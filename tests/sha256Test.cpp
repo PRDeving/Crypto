@@ -14,6 +14,30 @@ typedef struct {
   const char *msg;
 } Case;
 
+
+TEST_F(sha256Test, StringConstructor) {
+ Crypto::Sha256Hash h("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
+ ASSERT_TRUE(h.value); 
+}
+
+// This should be rewritten to run with uint256
+// TEST_F(sha256Test, NumericConstructor) {
+//  Crypto::Sha256Hash h((const unsigned int*)0xca978112ca1bbdcafac231b39a23dc4d, 32);
+//  ASSERT_TRUE(h.value); 
+// }
+
+TEST_F(sha256Test, HashEQ) {
+ Crypto::Sha256Hash h1("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
+ Crypto::Sha256Hash h2("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
+ ASSERT_TRUE(h1 == h2); 
+}
+
+TEST_F(sha256Test, HashNE) {
+ Crypto::Sha256Hash h1("ca978112ca1bbdcafac231b39a23dc4da786ef58147c4e72b9807785afee48bb");
+ Crypto::Sha256Hash h2("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
+ ASSERT_FALSE(h1 == h2); 
+}
+
 TEST_F(sha256Test, Hashing){
   const std::vector<Case> cases {
     // Strings
