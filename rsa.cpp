@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstring>
 #include <math.h>
 #include <time.h>
+#include "utils.hpp"
 #include "rsa.hpp"
 
 unsigned int primes[PRIMES_N] {
@@ -30,29 +32,24 @@ HASH gcd(HASH a, HASH b) {
 	return b;
 }
 
-HASH ExtEuclid(HASH a, HASH b) {
-	HASH x = 0, y = 1, u = 1, v = 0,
-			 gcd = b,
-			 m, n, q, r;
-
-	while (a != 0) {
-		q = gcd / a; r = gcd % a;
-		m = x - u * q; n = y - v * q;
-		gcd = a;
-		a = r; x = u; y = v; u = m; v = n;
-	}
-	return y;
+HASH lcm(HASH a, HASH b) {
+  HASH temp = gcd(a, b);
+  return temp ? (a / temp * b) : 0;
 }
 
-//ERROR al encriptar
+HASH modinv(const HASH a, const HASH m) {
+  HASH la = a % m;
+  for (int x = 1; x < m; x++) {
+    if ((la * x) % m == 1) return x;
+  }
+}
+
 HASH modExp(HASH b, HASH e, HASH m) {
-	if (b < 0 || e < 0 || m <= 0){
-		exit(1);
-	}
+	if (b < 0 || e < 0 || m <= 0) exit(1);
 	b = b % m;
 	if (e == 0) return 1;
 	if (e == 1) return b;
-	if ( e % 2 == 0){
+	if (e % 2 == 0){
 		return (modExp(b * b % m, e/2, m) % m);
 	}
 	if (e % 2 == 1){
@@ -61,48 +58,29 @@ HASH modExp(HASH b, HASH e, HASH m) {
 	return 0;
 }
 
-
 void RSA::generateKeys(struct Keyring *keys) {
-	srand(time(0));
-	int i,j = 0;
+  srand(time(0));
+  HASH e =  primes[Utils::randomBetween(0, PRIMES_N)];
+  HASH p, q, lambda;
 
-	HASH p = 0;
-	HASH q = 0;
-	HASH e = 4813;
-	HASH d = 0;
-	HASH max = 0;
-	HASH phi_max = 0;
+  do {
+		p =  primes[Utils::randomBetween(0, PRIMES_N)];
+		q =  primes[Utils::randomBetween(0, PRIMES_N)];
+    lambda = lcm((p - 1), (q - 1));
+  } while (gcd(e, lambda) != 1 || abs((p - q)) >> ((sizeof(int) * 10) - 100) == 0);
 
-	do {
-		int a =  (double)rand() * (PRIMES_N + 1) / (RAND_MAX + 1.0);
-		int b =  (double)rand() * (PRIMES_N + 1) / (RAND_MAX + 1.0);
-
-		p = primes[a];
-		q = primes[b];
-		max = p*q;
-		phi_max = (p - 1) * (q - 1);
-	}
-	while (!(p && q) || (p == q) || (gcd(phi_max, e) != 1));
-
-	d = ExtEuclid(phi_max, e);
-	while (d < 0){
-		d += phi_max;
-	}
-
-	keys -> e.modulus = max;
-	keys -> e.exponent = e;
-	keys -> d.modulus = max;
-	keys -> d.exponent = d;
+  HASH mod = p * q;
+  // Public
+	keys -> e.modulus = mod;
+	keys -> e.exponent = modinv(e, lambda);
+  //Private
+	keys -> d.modulus = mod;
+	keys -> d.exponent = e;
 }
 
 HASH *RSA::encrypt(const char *msg, const unsigned long size, struct Key *e) {
 	HASH *encrypted = (HASH*)malloc(sizeof(HASH) * size);
-	if (encrypted == NULL) {
-		fprintf(stderr, "Error: Heap allocation failed.\n");
-		return 0;
-	}
-
-	for(HASH i = 0; i < size; i++){
+	for(int i = 0; i < size; i++){
 		encrypted[i] = modExp(msg[i], e -> exponent, e -> modulus);
 	}
 	return encrypted;
@@ -111,21 +89,43 @@ HASH *RSA::encrypt(const char *msg, const unsigned long size, struct Key *e) {
 
 char *RSA::decrypt(const HASH *msg, const unsigned long size, struct Key *d) {
 	if (size % sizeof(HASH) != 0) {
-		fprintf(stderr, "Error: size (%d)\n", (int)sizeof(HASH));
+		fprintf(stderr, "Error: size (%d)\n", (int)sizeof(msg));
 		return NULL;
 	}
 
 	char *decrypted = (char*)malloc(size / sizeof(HASH));
-	if (!decrypted) {
-		fprintf(stderr, "Error: Heap allocation failed.\n");
-		return NULL;
-	}
-
 	for (HASH i = 0; i < size / 8; i++) {
 		decrypted[i] = modExp(msg[i], d -> exponent, d -> modulus);
 	}
-
 	return decrypted;
+}
+
+HASH numerizeString(const char *str) {
+  int size = strlen(str);
+  HASH r;
+	HASH *h = &r;
+	for (HASH i = 0; i < size; i++) {
+		h[i] = (int)str[i];
+	}
+  return r;
+}
+
+HASH RSA::sign(const char *str, struct Key *k) {
+  HASH n = numerizeString(str);
+  return sign(n, k);
+}
+
+HASH RSA::sign(HASH hash, struct Key *k) {
+  return modExp(hash, k -> exponent, k -> modulus);
+}
+
+bool RSA::check(HASH hash, const char *control, struct Key *k) {
+  HASH n = numerizeString(control);
+  return check(hash, n, k);
+}
+
+bool RSA::check(HASH hash, HASH control, struct Key *k) {
+  return modExp(hash, k -> exponent, k -> modulus) == control;
 }
 
 void RSA::print(struct Keyring *keyring) {
