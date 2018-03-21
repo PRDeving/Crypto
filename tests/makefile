@@ -3,4 +3,5 @@ compile:
 		../utils.cpp \
 		../sha256.cpp sha256Test.cpp\
 		../uint256.cpp uint256Test.cpp\
+		../rsa.cpp rsaTest.cpp\
 		run.cpp -lgtest -lpthread -lm -o runTests
