@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include "rsa.hpp"
 
+using namespace Crypto;
 unsigned int primes[PRIMES_N] {
   10007, 10009, 10037, 10039, 10061, 10067, 10069, 10079, 10091, 10093,
   10099, 10103, 10111, 10133, 10139, 10141, 10151, 10159, 10163, 10169,
@@ -42,6 +43,7 @@ HASH modinv(const HASH a, const HASH m) {
   for (int x = 1; x < m; x++) {
     if ((la * x) % m == 1) return x;
   }
+  return 0;
 }
 
 HASH modExp(HASH b, HASH e, HASH m) {
@@ -80,7 +82,7 @@ void RSA::generateKeys(struct Keyring *keys) {
 
 HASH *RSA::encrypt(const char *msg, const unsigned long size, struct Key *e) {
 	HASH *encrypted = (HASH*)malloc(sizeof(HASH) * size);
-	for(int i = 0; i < size; i++){
+	for(unsigned long i = 0; i < size; i++){
 		encrypted[i] = modExp(msg[i], e -> exponent, e -> modulus);
 	}
 	return encrypted;
@@ -94,7 +96,7 @@ char *RSA::decrypt(const HASH *msg, const unsigned long size, struct Key *d) {
 	}
 
 	char *decrypted = (char*)malloc(size / sizeof(HASH));
-	for (HASH i = 0; i < size / 8; i++) {
+	for (unsigned long i = 0; i < size / 8; i++) {
 		decrypted[i] = modExp(msg[i], d -> exponent, d -> modulus);
 	}
 	return decrypted;

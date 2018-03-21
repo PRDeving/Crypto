@@ -1,1 +1,4 @@
 runTests
+lib
+include
+*.o

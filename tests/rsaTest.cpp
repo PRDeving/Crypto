@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
-#include "rsa.hpp"
+#include "crypto.hpp"
 
+using namespace Crypto;
 class RSATest : public ::testing::Test {
   protected:
     virtual void SetUp() {

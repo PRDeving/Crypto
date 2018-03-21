@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "sha256.hpp"
 
+using namespace Crypto;
 Crypto::Sha256Hash::Sha256Hash(const unsigned int hash[HASH_LEN], size_t len) {
   assert(hash && len == HASH_LEN);
   std::memcpy(value, hash, sizeof(value));
@@ -153,7 +154,7 @@ std::string Crypto::sha256(std::string input) {
 
 	char buf[2 * SHA256::DIGEST_SIZE + 1];
 	buf[2 * SHA256::DIGEST_SIZE] = 0;
-	for (int i = 0; i < SHA256::DIGEST_SIZE; i++) {
+	for (unsigned int i = 0; i < SHA256::DIGEST_SIZE; i++) {
 		sprintf(buf + i * 2, "%02x", digest[i]);
 	}
 	return std::string(buf);

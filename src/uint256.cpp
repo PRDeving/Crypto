@@ -3,6 +3,7 @@
 #include "uint256.hpp"
 #include "utils.hpp"
 
+using namespace Crypto;
 Uint256::Uint256() : value() {}
 Uint256::Uint256(const char *str) : value() {
   assert(str && strlen(str) == NUM_WORDS * 8);

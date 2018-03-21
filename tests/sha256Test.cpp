@@ -1,7 +1,8 @@
 #include "gtest/gtest.h"
-#include "sha256.hpp"
+#include "crypto.hpp"
 #include <vector>
 
+using namespace Crypto;
 class sha256Test : public ::testing::Test {
   protected:
     virtual void SetUp() { }

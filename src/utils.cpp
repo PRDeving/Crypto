@@ -1,5 +1,6 @@
 #include "utils.hpp"
 
+using namespace Crypto;
 int Utils::parseHexDigit(int ch) {
   if ('0' <= ch && ch <= '9')
     return ch - '0';

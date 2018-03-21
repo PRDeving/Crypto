@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
-#include "uint256.hpp"
+#include "crypto.hpp"
 
+using namespace Crypto;
 class uint256Test : public ::testing::Test {
   protected:
     virtual void SetUp() { }

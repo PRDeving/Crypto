@@ -1,7 +1,18 @@
+CC = g++
+FLAGS = -std=c++11 -std=gnu++11 -Wall
+INCLUDES = -I../src
+LIBRARIES = -lgtest -lm -lpthread
+NAME = runTests
+
+FILES = ../src/utils.cpp ../src/uint256.cpp ../src/sha256.cpp ../src/rsa.cpp
+TESTS = sha256Test.cpp uint256Test.cpp rsaTest.cpp run.cpp
+
 compile:
-	g++ -std=c++11 -std=gnu++11 -I.. \
-		../utils.cpp \
-		../sha256.cpp sha256Test.cpp\
-		../uint256.cpp uint256Test.cpp\
-		../rsa.cpp rsaTest.cpp\
-		run.cpp -lgtest -lpthread -lm -o runTests
+	$(CC) $(FLAGS) $(INCLUDES) $(FILES) $(TESTS) $(LIBRARIES) -o $(NAME)
+
+lib:
+	$(CC) $(FLAGS) -I../include $(TESTS) -L../lib $(LIBRARIES) -lcrypto -o $(NAME)
+
+clean:
+	rm $(NAME)
+
