@@ -5,7 +5,7 @@ FLAGS = -std=c++11 -std=gnu++11 -c -Wall
 INCLUDES = -Iincludes
 LIBRARIES = -lm -lpthread
 NAME = crypto
-OBJS = src/utils.o src/uint256.o src/sha256.o src/rsa.o
+OBJS = src/utils.o src/uint256.o src/sha256.o src/rsa.o src/base64.o
 
 prepare:
 	mkdir -p include lib
