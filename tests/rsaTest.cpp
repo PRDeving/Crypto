@@ -25,14 +25,18 @@ TEST_F(RSATest, KeyGen) {
 
 TEST_F(RSATest, encodeAndDecode) {
   HASH *crypt = RSA::encrypt(msg, strlen(msg), &keyring.e);
-  char *decrypt = RSA::decrypt(crypt, 8 * strlen(msg), &keyring.d);
-  EXPECT_STREQ(decrypt, msg);
+  std::string decrypt = RSA::decrypt(crypt, strlen(msg), &keyring.d);
+  free(crypt);
+
+  EXPECT_STREQ(decrypt.c_str(), msg);
 }
 
 TEST_F(RSATest, signAndCheck_HASH) {
   HASH *crypt = RSA::encrypt(msg, strlen(msg), &keyring.e);
   HASH sign = RSA::sign(*crypt, &keyring.d);
+
   ASSERT_TRUE(RSA::check(sign, *crypt, &keyring.e));
+  free(crypt);
 }
 
 TEST_F(RSATest, signAndCheck_string) {

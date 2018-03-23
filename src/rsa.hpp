@@ -1,6 +1,8 @@
 #ifndef RSA_HPP
 #define RSA_HPP
 
+#include <string>
+
 #define PRIMES_N 116
 typedef long long HASH;
 
@@ -18,7 +20,7 @@ namespace Crypto {
 
     void generateKeys(struct Keyring *keys);
     HASH *encrypt(const char *msg, const unsigned long size, struct Key *key);
-    char *decrypt(const HASH *msg, const unsigned long size, struct Key *key);
+    std::string decrypt(const HASH *msg, const unsigned long size, struct Key *key);
     HASH sign(const char *str, struct Key *k);
     HASH sign(HASH hash, struct Key *k);
     bool check(HASH hash, const char *str, struct Key *k);

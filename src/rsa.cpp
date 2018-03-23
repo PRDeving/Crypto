@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
+#include <string>
 #include <math.h>
 #include <time.h>
 #include "utils.hpp"
@@ -82,21 +83,15 @@ void RSA::generateKeys(struct Keyring *keys) {
 
 HASH *RSA::encrypt(const char *msg, const unsigned long size, struct Key *e) {
 	HASH *encrypted = (HASH*)malloc(sizeof(HASH) * size);
-	for(unsigned long i = 0; i < size; i++){
+	for (unsigned long i = 0; i < size; i++) {
 		encrypted[i] = modExp(msg[i], e -> exponent, e -> modulus);
 	}
 	return encrypted;
 }
 
-
-char *RSA::decrypt(const HASH *msg, const unsigned long size, struct Key *d) {
-	if (size % sizeof(HASH) != 0) {
-		fprintf(stderr, "Error: size (%d)\n", (int)sizeof(msg));
-		return NULL;
-	}
-
-	char *decrypted = (char*)malloc(size / sizeof(HASH));
-	for (unsigned long i = 0; i < size / 8; i++) {
+std::string RSA::decrypt(const HASH *msg, const unsigned long size, struct Key *d) {
+  std::string decrypted(size, '\0');
+	for (unsigned long i = 0; i < size; i++) {
 		decrypted[i] = modExp(msg[i], d -> exponent, d -> modulus);
 	}
 	return decrypted;

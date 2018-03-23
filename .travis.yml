@@ -2,10 +2,11 @@ language: cpp
 sudo: required
 install: ./install-dependencies.sh
 script:
+- make
 - make test
 - ./tests/runTests
 branches:
   only:
   - master
-notifications:
-  email: pablo.deving@gmail.com
+# notifications:
+#   email: pablo.deving@gmail.com
