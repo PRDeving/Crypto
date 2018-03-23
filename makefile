@@ -24,3 +24,6 @@ install:
 
 clean:
 	rm -rf include lib src/*.o
+
+test:
+	make -C tests
