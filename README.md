@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PRDeving/Crypto.svg?branch=master)](https://travis-ci.org/PRDeving/Crypto)
+
 # CRYPTO
 
 simple library in c++ for cryptography.
