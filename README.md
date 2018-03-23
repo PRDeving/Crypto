@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PRDeving/Crypto.svg?branch=master)](https://travis-ci.org/PRDeving/Crypto)
+
 # CRYPTO
 
 simple library in c++ for cryptography.
@@ -26,9 +28,13 @@ after that, your product should include crypto.hpp `#include "crypto.hpp"` and l
 
 ### Testing
 
-The testing suite is gtest, grab it from its github, cmake->make->make install and make the tests folder
+The testing suite is gtest, run `./install-dependencies.sh` to install it.
 
-The tests can be compiled either with the crypto source code (`$make`) or the .a lib (`$make static`)
+The tests can be compiled in the tests folder, either with the crypto source code (`$make`) or the .a lib (`$make static`)
+
+Tests can also be built with `$make test` in the root folder.
+
+Once compiled you can pass the tests run `runTests` in tests folder
 
 
 ### Organization
