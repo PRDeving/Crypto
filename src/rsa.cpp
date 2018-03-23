@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 #include "utils.hpp"
+#include "base64.hpp"
 #include "rsa.hpp"
 
 using namespace Crypto;
@@ -81,6 +82,31 @@ void RSA::generateKeys(struct Keyring *keys) {
 	keys -> d.exponent = e;
 }
 
+void RSA::parseKey(struct Key *k, std::string b64) {
+  std::string r = Base64::decode(b64.c_str());
+  int delim = r.find(',');
+
+  k -> exponent = (HASH)atoi(r.substr(0, delim).c_str());
+  k -> modulus = (HASH)atoi(r.substr(delim + 1, r.length()).c_str());
+}
+
+
+void RSA::parseKeyring(struct Keyring *keys, std::string b64) {
+  std::string r = Base64::decode(b64.c_str());
+  int kd = r.find(';');
+
+  std::string d = r.substr(0, kd);
+  int dd = d.find(',');
+  std::string e = r.substr(kd + 1, r.length());
+  int ed = e.find(',');
+
+  keys -> d.exponent = (HASH)atoi(d.substr(0, dd).c_str());
+  keys -> d.modulus = (HASH)atoi(d.substr(dd + 1, d.length()).c_str());
+
+  keys -> e.exponent = (HASH)atoi(e.substr(0, ed).c_str());
+  keys -> e.modulus = (HASH)atoi(e.substr(ed + 1, e.length()).c_str());
+}
+
 HASH *RSA::encrypt(const char *msg, const unsigned long size, struct Key *e) {
 	HASH *encrypted = (HASH*)malloc(sizeof(HASH) * size);
 	for (unsigned long i = 0; i < size; i++) {
@@ -123,6 +149,17 @@ bool RSA::check(HASH hash, const char *control, struct Key *k) {
 
 bool RSA::check(HASH hash, HASH control, struct Key *k) {
   return modExp(hash, k -> exponent, k -> modulus) == control;
+}
+
+std::string RSA::serialize(struct Key *key) {
+  std::string s = std::to_string(key -> exponent) + ',' + std::to_string(key -> modulus);
+  return Base64::encode(s.c_str());
+}
+
+std::string RSA::serialize(struct Keyring *keys) {
+  std::string s = std::to_string(keys -> d.exponent) + ',' + std::to_string(keys -> d.modulus) + ';'
+                  + std::to_string(keys -> e.exponent) + ',' + std::to_string(keys -> e.modulus);
+  return Base64::encode(s.c_str());
 }
 
 void RSA::print(struct Keyring *keyring) {

@@ -54,12 +54,16 @@ Crypto
   |   |   |- <Key> e (for encrypt)
   |   |
   |   |- <void> generateKeys(struct Keyring *out)
+  |   |- <void> parseKeyring(struct Keyring *out, std::string b64)
+  |   |- <void> parseKey(struct Key *out, std::string b64)
   |   |- <long long*> encrypt(const char *message, const unsigned long size, struct Key *public)
   |   |- <std::string> decrypt(const long long *message, const unsigned long size, struct Key *private)
   |   |- <long long> sign(const char *message, struct Key *private)
   |   |- <long long> sign(long long *message, struct Key *private)
   |   |- <bool> check(long long hash, const char *control, struct Key *public)
   |   |- <bool> check(long long hash, long long control, struct Key *public)
+  |   |- <std::string> serialize(struct Key*)
+  |   |- <std::string> serialize(struct Keyring*);
   |   +- <void> print(struct Keyring*) (debug pruporses)
   |
   |-SHA256(class helper) (class wil be renamed as SHA256::CSHA256 and converted to namespace)
