@@ -49,7 +49,7 @@ Crypto
   |   |
   |   |- <void> generateKeys(struct Keyring *out)
   |   |- <long long*> encrypt(const char *message, const unsigned long size, struct Key *public)
-  |   |- <char*> decrypt(const long long *message, const unsigned long size, struct Key *private)
+  |   |- <std::string> decrypt(const long long *message, const unsigned long size, struct Key *private)
   |   |- <long long> sign(const char *message, struct Key *private)
   |   |- <long long> sign(long long *message, struct Key *private)
   |   |- <bool> check(long long hash, const char *control, struct Key *public)
