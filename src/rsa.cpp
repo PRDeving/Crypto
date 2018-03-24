@@ -146,10 +146,9 @@ std::string RSA::sign(HASH *hash, int size, struct Key *k) {
 
 bool RSA::check(std::string signature, const char *control, struct Key *k) {
   std::string sig = Base64::decode(signature.c_str());
-  int size_delim = sig.find(':');
-  int size = atoi(sig.substr(size_delim + 1, sig.length()).c_str());
 
   int idx = 0;
+  int size_delim = sig.find(':');
   std::stringstream ss(sig.substr(0, size_delim));
   std::string item;
   while (std::getline(ss, item, 'x')) {
