@@ -4,6 +4,7 @@
 #include <string>
 #include <math.h>
 #include <time.h>
+#include <sstream>
 #include "utils.hpp"
 #include "base64.hpp"
 #include "rsa.hpp"
@@ -123,32 +124,39 @@ std::string RSA::decrypt(const HASH *msg, const unsigned long size, struct Key *
 	return decrypted;
 }
 
-HASH numerizeString(const char *str) {
+std::string RSA::sign(const char *str, struct Key *k) {
   int size = strlen(str);
-  HASH r;
-	HASH *h = &r;
-	for (HASH i = 0; i < size; i++) {
+  HASH h[size];
+	for (int i = 0; i < size; i++) {
 		h[i] = (int)str[i];
 	}
-  return r;
+  return sign(&h[0], size, k);
 }
 
-HASH RSA::sign(const char *str, struct Key *k) {
-  HASH n = numerizeString(str);
-  return sign(n, k);
+std::string RSA::sign(HASH *hash, int size, struct Key *k) {
+  std::string r = "";
+  for (int i = 0; i < size; i++) {
+    if (i > 0) r += "x";
+    r += std::to_string(modExp(*(hash + i), k -> exponent, k -> modulus));
+  }
+  r += ":" + std::to_string(size);
+
+  return Base64::encode(r.c_str());
 }
 
-HASH RSA::sign(HASH hash, struct Key *k) {
-  return modExp(hash, k -> exponent, k -> modulus);
-}
+bool RSA::check(std::string signature, const char *control, struct Key *k) {
+  std::string sig = Base64::decode(signature.c_str());
+  int size_delim = sig.find(':');
+  int size = atoi(sig.substr(size_delim + 1, sig.length()).c_str());
 
-bool RSA::check(HASH hash, const char *control, struct Key *k) {
-  HASH n = numerizeString(control);
-  return check(hash, n, k);
-}
-
-bool RSA::check(HASH hash, HASH control, struct Key *k) {
-  return modExp(hash, k -> exponent, k -> modulus) == control;
+  int idx = 0;
+  std::stringstream ss(sig.substr(0, size_delim));
+  std::string item;
+  while (std::getline(ss, item, 'x')) {
+    if (modExp((HASH)atoi(item.c_str()), k -> exponent, k -> modulus) != (HASH)control[idx]) return false;
+    idx++;
+  }
+  return true;
 }
 
 std::string RSA::serialize(struct Key *key) {
